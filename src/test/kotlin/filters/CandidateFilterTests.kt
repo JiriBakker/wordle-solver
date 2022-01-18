@@ -1,15 +1,12 @@
 package filters
 
+import input.FiveLetterWords
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class CandidateFilterTests {
 
-    private val testWords = listOf(
-        "abcde",
-        "fghij",
-        "klmno"
-    )
+    private val fiveLetterWords = FiveLetterWords.load()
 
     @Test
     fun filterCandidates() {
@@ -19,7 +16,7 @@ class CandidateFilterTests {
             "aeros" to "x?---"
         )
 
-        val candidates = candidateFilter.filterCandidates(testWords, guessHistory)
+        val candidates = candidateFilter.filterCandidates(fiveLetterWords, guessHistory)
 
         assertEquals(1, candidates.size)
     }

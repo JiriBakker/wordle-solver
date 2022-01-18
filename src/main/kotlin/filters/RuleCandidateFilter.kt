@@ -1,14 +1,12 @@
 package filters
 
-private typealias Rule = (String) -> Boolean
-
 class RuleCandidateFilter : CandidateFilter {
 
     override fun filterCandidates(
         candidates: List<String>,
         guessHistory: List<Pair<String, String>>
     ): List<String> {
-        val rules = mutableListOf<Rule>()
+        val rules = mutableListOf<(String) -> Boolean>()
 
         guessHistory.forEach { (guess, result) ->
             result.forEachIndexed { index, char ->

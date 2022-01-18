@@ -9,19 +9,24 @@ class RemainingCandidateFilter : CandidateFilter {
         guessHistory: List<Pair<String, String>>
     ): List<String> {
         val correctLetters = mutableMapOf<Int, Char>()
-        val letterCounts = mutableMapOf<Char, Int>()
+        val minLetterCounts = mutableMapOf<Char, Int>()
+        val maxLetterCounts = mutableMapOf<Char, Int>()
         val invalidPositions = mutableMapOf<Char, Set<Int>>()
 
         guessHistory.forEach { (guess, result) ->
-            val resultLetterCounts =
-                result.zip(guess).withIndex()
-                    .groupBy { it.value.second }
-                    .map { it.key to it.value.count { result -> result.value.first in setOf('?', 'x') } }
-                    .toMap()
+            result.zip(guess).withIndex()
+                .groupBy { it.value.second }
+                .forEach { (char, results) ->
+                    val misses = results.count { it.value.first == '-' }
+                    val hits = results.count { it.value.first == '?' || it.value.first == 'x' }
+                    if (misses > 0) {
+                        minLetterCounts[char] = hits
+                        maxLetterCounts[char] = hits
+                    } else {
+                        minLetterCounts[char] = max(hits, minLetterCounts[char] ?: 0)
+                    }
+                }
 
-            resultLetterCounts.forEach { (char, count) ->
-                letterCounts[char] = max(count, letterCounts[char] ?: 0)
-            }
 
             result.zip(guess).withIndex()
                 .filter { it.value.first == 'x' }
@@ -38,7 +43,9 @@ class RemainingCandidateFilter : CandidateFilter {
 
         return candidates.filter { word ->
             val matchesCorrectLetters = correctLetters.all { (index, char) -> word[index] == char }
-            val matchesLetterCounts = letterCounts.all { (char, count) -> word.count { it == char } == count }
+            val matchesLetterCounts =
+                minLetterCounts.all { (char, count) -> word.count { it == char } >= count }
+                    && maxLetterCounts.all { (char, count) -> word.count { it == char } <= count }
             val matchesInvalidPositions = invalidPositions.all { (char, positions) -> positions.none { word[it] == char } }
             matchesCorrectLetters && matchesLetterCounts && matchesInvalidPositions
         }

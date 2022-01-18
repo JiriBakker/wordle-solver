@@ -1,0 +1,22 @@
+#Mac
+.DS_Store
+
+#eclipse
+.project
+.classpath
+.settings
+target
+#intellij
+*.iml
+.idea
+retail-promoting-service-server/bin/
+
+### Maven
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.next
+release.properties
+
+### Gradle
+.gradle
+build
