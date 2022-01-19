@@ -3,5 +3,5 @@ package input
 import java.io.File
 
 object FiveLetterWords {
-    fun load() = File("words.txt").readLines()
+    fun loadEnglish() = File("words/english_5letter.txt").readLines()
 }

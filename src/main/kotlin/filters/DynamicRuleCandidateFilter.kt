@@ -1,27 +1,30 @@
 package filters
 
+import solver.Guess
+import solver.Result
 
-class DynamicCandidateFilter(private val remainingThreshold: Int) : CandidateFilter {
+class HybridCandidateFilter : CandidateFilter {
 
-    private val internalFilter = RemainingCandidateFilter()
+    private val internalFilter = RuleCandidateFilter()
 
     override fun filterCandidates(
         candidates: List<String>,
-        guessHistory: List<Pair<String, String>>
+        guessHistory: List<Pair<Guess, Result>>
     ): List<String> {
-        val remainingCandidates = internalFilter.filterCandidates(candidates, guessHistory)
+        if (guessHistory.size < 2) {
+            // Ignore results and choose candidates to cover the most unique letters
+            val letterSpreadCandidates =
+                candidates.filter { candidate ->
+                    candidate.none { char ->
+                        guessHistory.any { (guess, _) -> guess.contains(char) }
+                    }
+                }
 
-        if (remainingCandidates.size < remainingThreshold) {
-            return remainingCandidates
+            if (letterSpreadCandidates.isNotEmpty()) {
+                return letterSpreadCandidates
+            }
         }
 
-        val letterSpreadCandidates =
-            candidates.filter { candidate ->
-                candidate.none { char ->
-                    guessHistory.any { (guess, _) -> guess.contains(char) }
-                }
-            }
-
-        return letterSpreadCandidates.ifEmpty { remainingCandidates }
+        return internalFilter.filterCandidates(candidates, guessHistory)
     }
 }

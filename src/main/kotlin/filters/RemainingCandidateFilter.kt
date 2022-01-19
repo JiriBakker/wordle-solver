@@ -1,12 +1,14 @@
 package filters
 
+import solver.Guess
+import solver.Result
 import java.lang.Integer.max
 
 class RemainingCandidateFilter : CandidateFilter {
 
     override fun filterCandidates(
         candidates: List<String>,
-        guessHistory: List<Pair<String, String>>
+        guessHistory: List<Pair<Guess, Result>>
     ): List<String> {
         val correctLetters = mutableMapOf<Int, Char>()
         val minLetterCounts = mutableMapOf<Char, Int>()

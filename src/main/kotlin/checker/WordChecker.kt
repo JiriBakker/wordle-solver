@@ -1,4 +1,4 @@
-package util
+package checker
 
 fun String.wordleMatch(guess: String): String {
     val letterCounts = this.groupBy { it }.map { it.key to it.value.size }.toMap().toMutableMap()

@@ -1,42 +1,30 @@
-import filters.DynamicCandidateFilter
-import filters.RemainingCandidateFilter
-import filters.RuleCandidateFilter
-import input.FiveLetterWords
-import selectors.SpreadCandidateSelector
+import solver.Guess
+import solver.Result
+import solver.WordleSolver
 
 fun main() {
-    val fiveLetterWords = FiveLetterWords.load()
+    WordleSolver.suggestGuesses(
+        sequence {
+            while (true) {
+                try {
+                    print("Provide guess: ")
+                    val guess = Guess(readLine())
 
-    val candidateFilters = listOf(
-        RuleCandidateFilter(),
-        RemainingCandidateFilter(),
-        DynamicCandidateFilter(100)
-    )
+                    print("Provide result: ")
+                    val result = Result(readLine())
 
-    val candidateSelector = SpreadCandidateSelector()
+                    if (result.all { it == 'x' }) {
+                        println("You're welcome!")
+                        return@sequence
+                    }
 
-    val guessHistory = mutableListOf<Pair<String, String>>()
-    var candidates = candidateFilters.associateWith { fiveLetterWords }
-
-    while (true) {
-        val guesses = candidates.map { (_, words) ->
-            candidateSelector.selectBest(words)
-        }
-        println("Try: ${guesses.joinToString(" - ")}")
-
-        val guess  = readLine()
-        val result = readLine()
-
-        when {
-            guess?.length  != 5 -> println("Unexpected length ${guess?.length}. Try again")
-            result?.length != 5 -> println("Unexpected length ${result?.length}. Try again")
-            else -> {
-                guessHistory.add(guess to result)
-
-                candidates = candidateFilters.associateWith { filter ->
-                    filter.filterCandidates(fiveLetterWords, guessHistory)
+                   yield(guess to result)
+                } catch (e: Exception) {
+                    println("ERROR ${e.message}. Try again")
                 }
             }
         }
+    ).forEach { guesses ->
+        println("Try: ${guesses.joinToString(" - ")}")
     }
 }
