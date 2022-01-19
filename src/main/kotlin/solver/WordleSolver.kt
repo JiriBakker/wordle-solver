@@ -23,7 +23,7 @@ object WordleSolver {
         var candidates = candidateFilters.associateWith { fiveLetterWords }
 
         return sequence {
-            while (input.iterator().hasNext()) {
+           do {
                 val guesses = candidates.map { (_, words) ->
                     candidateSelector.selectBest(words)
                 }
@@ -41,7 +41,7 @@ object WordleSolver {
                         }
                     }
                 }
-            }
+            } while (input.iterator().hasNext())
         }
     }
 }

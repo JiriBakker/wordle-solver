@@ -3,6 +3,8 @@ import solver.Result
 import solver.WordleSolver
 
 fun main() {
+    println("Wordle Solver\n")
+
     WordleSolver.suggestGuesses(
         sequence {
             while (true) {
